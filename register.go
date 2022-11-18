@@ -9,9 +9,9 @@ import (
 	"go.etcd.io/etcd/client/v3"
 )
 
-func register(ctx context.Context, schema, service, host string, port int, endpoints []string, ttl, weight int64) (*etcdRegistry, error) {
+func register(ctx context.Context, scheme, service, host string, port int, endpoints []string, ttl, weight int64) (*etcdRegistry, error) {
 	r := new(etcdRegistry)
-	err := r.Register(ctx, schema, service, host, port, endpoints, ttl, weight)
+	err := r.Register(ctx, scheme, service, host, port, endpoints, ttl, weight)
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ type etcdRegistry struct {
 	leaseID clientv3.LeaseID
 }
 
-func (r *etcdRegistry) Register(ctx context.Context, schema, service, host string, port int, endpoints []string, ttl, weight int64) error {
+func (r *etcdRegistry) Register(ctx context.Context, scheme, service, host string, port int, endpoints []string, ttl, weight int64) error {
 	cfg := clientv3.Config{
 		Endpoints:   endpoints,
 		DialTimeout: time.Second * 3,
@@ -40,7 +40,7 @@ func (r *etcdRegistry) Register(ctx context.Context, schema, service, host strin
 		return err
 	}
 	address := net.JoinHostPort(host, strconv.Itoa(port))
-	_, err = client.Put(ctx, joinFullPath(schema, service, address, weight), address, clientv3.WithLease(grantRes.ID))
+	_, err = client.Put(ctx, joinFullPath(scheme, service, address, weight), address, clientv3.WithLease(grantRes.ID))
 	if err != nil {
 		return err
 	}

@@ -52,7 +52,6 @@ func (w *wrrPickerBuilder) Build(info base.PickerBuildInfo) balancer.Picker {
 		ci := connInfo{
 			sc:      sc,
 			weight:  weight,
-			current: weight,
 		}
 		scs = append(scs, &ci)
 	}

@@ -14,8 +14,6 @@ var (
 )
 
 type pool struct {
-	target string
-
 	size   uint32
 	cursor uint32
 
@@ -25,7 +23,7 @@ type pool struct {
 	mutex sync.Mutex
 }
 
-func newPool(fn func() (*grpc.ClientConn, error), target string, size uint32) (*pool, error) {
+func newPool(fn func() (*grpc.ClientConn, error), size uint32) (*pool, error) {
 	clients := make([]*grpc.ClientConn, 0, size)
 	for i := 0; i < int(size); i++ {
 		cc, err := fn()
@@ -36,7 +34,6 @@ func newPool(fn func() (*grpc.ClientConn, error), target string, size uint32) (*
 	}
 
 	return &pool{
-		target:  target,
 		size:    size,
 		clients: clients,
 		fn:      fn,

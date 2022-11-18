@@ -2,6 +2,7 @@ package srad
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"time"
 	"unsafe"
@@ -41,9 +42,13 @@ func discoverPool(scheme, service string, endpoints []string) (*pool, error) {
 
 	return newPool(
 		func() (*grpc.ClientConn, error) {
-			return grpc.Dial(joinPathPrefix(service, service), grpc.WithTransportCredentials(insecure.NewCredentials()))
+			return grpc.Dial(
+				joinPathPrefix(service, service),
+				grpc.WithTransportCredentials(insecure.NewCredentials()),
+				grpc.WithDefaultServiceConfig(fmt.Sprintf(`{"loadBalancingPolicy": %s}`, smoothWeightedRoundRobin)),
+			)
 		},
-		"", 1<<2,
+		1<<2,
 	)
 }
 
